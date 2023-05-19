@@ -17,10 +17,22 @@ module.exports.verifyToken = (req, res, next) => {
             })
         }
 
-        const userCheck = await User.findOne({ _id: decoded.data.id })
+        const userCheck = await User.findOne(
+            {
+                _id: decoded.data.id,
+                deleted: false
+            }
+        )
+
         if (!userCheck) {
             return res.status(401).json({
                 message: 'User does not exist'
+            })
+        }
+
+        if (userCheck.status === 1) {
+            return res.status(403).json({
+                message: 'Account suspended.'
             })
         }
 
