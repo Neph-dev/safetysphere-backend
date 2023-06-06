@@ -12,6 +12,7 @@ router.get('/suspendedusers', verifyToken.verifyToken, user.getSuspendedUsers)
 
 router.patch('/softdelete/:id', verifyToken.verifyToken, user.softDeleteUser)
 router.patch('/changeUserAccessLevel/:id', verifyToken.verifyToken, user.changeUserAccessLevel)
+router.patch('/suspendUser/:id', verifyToken.verifyToken, user.suspendUser)
 
 
 module.exports = router

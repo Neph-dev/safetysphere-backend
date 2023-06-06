@@ -15,9 +15,24 @@ module.exports.getAllReports = async (req, res) => {
     })
 }
 
-module.exports.getSingleReport = async (req, res) => {
-    const report = await Report.findById(req.params.id)
+module.exports.getAllUserReports = async (req, res) => {
 
+    const reports = await Report.find({ whistleBlower: req.userId })
+    if (reports) {
+        return res.status(200).json({
+            message: 'All user reports',
+            reports
+        })
+    }
+
+    return res.status(404).json({
+        message: 'No reports found'
+    })
+}
+
+module.exports.getSingleReport = async (req, res) => {
+
+    const report = await Report.findById(req.params.id)
     if (report) {
         return res.status(200).json({
             message: 'Report',
@@ -30,12 +45,34 @@ module.exports.getSingleReport = async (req, res) => {
     })
 }
 
+module.exports.getReportForaPeriod = async (req, res) => {
+
+    let minDate = req.body.minDate
+    let maxDate = req.body.maxDate
+
+    const reports = await Report.find({
+        date: {
+            $gte: minDate,
+            $lte: maxDate
+        }
+    })
+    if (reports) {
+        return res.status(200).json({
+            message: 'Reports',
+            reports
+        })
+    }
+    return res.status(404).json({
+        message: 'No reports found'
+    })
+}
+
 module.exports.addReport = async (req, res) => {
 
     const report = new Report({
-        whistleBlower: req.body.whistleBlower,
+        whistleBlower: req.userId,
         location: req.body.location,
-        incidentType: req.body.incidentType,
+        incidentType: req.body.type,
         title: req.body.title,
         cause: req.body.cause,
         description: req.body.description,
@@ -43,10 +80,17 @@ module.exports.addReport = async (req, res) => {
         date: req.body.date,
         file: req.body.file
     })
-    const savedReport = await report.save()
 
-    return res.status(200).json({
-        message: 'Report added successfully',
-        savedReport
-    })
+    await report.save()
+        .then(() => {
+            res.status(200).json({
+                message: 'Report added successfully'
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                message: 'Error adding report',
+                error: err
+            })
+        })
 }

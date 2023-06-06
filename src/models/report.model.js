@@ -9,13 +9,11 @@ const reportSchema = new Schema({
         required: true
     },
     location: {
-        type: Schema.Types.ObjectId,
-        ref: 'Location',
+        type: String,
         required: true
     },
     incidentType: {
-        type: Schema.Types.ObjectId,
-        ref: 'IncidentType',
+        type: String,
         required: true
     },
     title: {
@@ -24,7 +22,8 @@ const reportSchema = new Schema({
     },
     cause: {
         type: String,
-        required: true
+        required: false,
+        default: 'Unknown'
     },
     description: {
         type: String,
@@ -32,7 +31,8 @@ const reportSchema = new Schema({
     },
     actionsTaken: {
         type: String,
-        required: false
+        required: false,
+        default: 'None'
     },
     date: {
         type: Date,
@@ -40,7 +40,8 @@ const reportSchema = new Schema({
     },
     file: {
         type: String,
-        required: false
+        required: false,
+        default: 'None'
     }
 })
 

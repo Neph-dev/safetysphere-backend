@@ -21,7 +21,7 @@ module.exports.addUser = async (req, res) => {
 
     await checkUserAccessLevel(req, res)
 
-    const emailCheck = await User.findOne({ email: req.body.email })
+    const emailCheck = await User.findOne({ email: req.body.email, deleted: false })
     if (emailCheck) {
         return res.status(400).json({
             message: 'User already exists'
@@ -36,7 +36,7 @@ module.exports.addUser = async (req, res) => {
         const user = new User({
             name: req.body.name,
             surname: req.body.surname,
-            profilePicture: req.body.profilePicture,
+            profilePicture: req.body.profilePicture ? req.body.profilePicture : '',
             position: req.body.position,
             email: req.body.email,
             phoneNumber: req.body.phoneNumber,
@@ -47,12 +47,12 @@ module.exports.addUser = async (req, res) => {
         try {
             const savedUser = await user.save()
 
-            transporter.sendMail({
-                from: fromEmail,
-                to: 'webwithneph@gmail.com', //email.toLowerCase(),
-                subject: 'YOUR GENERATED PASSWORD',
-                text: `Your new Send-It password is: ${generatedPassword} \n \nDO NOT SHARE THIS WITH ANYONE!`,
-            })
+            // transporter.sendMail({
+            //     from: fromEmail,
+            //     to: email.toLowerCase(),
+            //     subject: 'YOUR GENERATED PASSWORD',
+            //     text: `Your new Send-It password is: ${generatedPassword} \n \nDO NOT SHARE THIS WITH ANYONE!`,
+            // })
 
             return res.status(200).json({
                 message: 'User added successfully',
@@ -86,7 +86,8 @@ module.exports.changeUserAccessLevel = async (req, res) => {
 module.exports.suspendUser = async (req, res) => {
 
     await checkUserAccessLevel(req, res)
-    const user = await User.findByIdAndUpdate(req.params.id, { status: 1 })
+
+    const user = await User.findByIdAndUpdate(req.params.id, { status: req.body.body })
 
     if (res.error) return res.status(403).json(res.error)
 
@@ -113,7 +114,7 @@ module.exports.getAllUsers = async (req, res) => {
 
     await checkUserAccessLevel(req, res)
 
-    const users = await User.find({ deleted: false, status: 0 })
+    const users = await User.find({ deleted: false })
 
     if (res.error) return res.status(403).json(res.error)
 

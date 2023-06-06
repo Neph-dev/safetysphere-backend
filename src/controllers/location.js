@@ -3,7 +3,7 @@ const Location = require('../models/location.model')
 
 
 module.exports.getAllLocations = async (req, res) => {
-    const locations = await Location.find({}, { deleted: false })
+    const locations = await Location.find({ deleted: false })
 
     if (locations) {
         return res.status(200).json({

@@ -13,15 +13,16 @@ const whitelist = [`http://localhost:${PORT}`]
 const methods = ['GET', 'POST', 'PATCH', 'DELETE']
 
 const corsOptions = {
-    origin: whitelist,
+    origin: "*",
     methods: methods,
-    optionsSuccessStatus: 204,
+    optionsSuccessStatus: 204
 }
 
 app.use(cors(corsOptions))
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }))
 app.use(cookieParser())
-app.use("/v1/", require("./src/routes"));
+app.use("/v1/", require("./src/routes"))
 
 mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
 const connection = mongoose.connection

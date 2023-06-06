@@ -4,7 +4,7 @@ const IncidentType = require('../models/incidentType.model')
 
 module.exports.getAllIncidentTypes = async (req, res) => {
 
-    const incidentTypes = await IncidentType.find({}, { deleted: false })
+    const incidentTypes = await IncidentType.find({ deleted: false })
 
     if (incidentTypes) {
         return res.status(200).json({
