@@ -24,8 +24,15 @@ app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 5000
 app.use(cookieParser())
 app.use("/v1/", require("./src/routes"))
 
-mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
-const connection = mongoose.connection
+const connectMongoDB = async () => {
+    await mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
-connection.once('open', () => console.log('MongoDB database connection established successfully'))
-app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
+    // const connection = mongoose.connection
+    // connection.once('open', () => console.log('MongoDB database connection established successfully'))
+
+    console.log('MongoDB database connection established successfully')
+}
+
+connectMongoDB().then(() => {
+    app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
+})
