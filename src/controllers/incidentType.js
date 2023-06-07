@@ -7,7 +7,7 @@ module.exports.getAllIncidentTypes = async (req, res) => {
     const incidentTypes = await IncidentType.find({ deleted: false })
 
     if (incidentTypes) {
-        return res.status(200).json({
+        return res.status(200).send({
             message: 'All IncidentType',
             incidentTypes
         })
