@@ -74,6 +74,8 @@ module.exports.getReportForaPeriod = async (req, res) => {
             $lte: maxDate
         }
     })
+        .select("whistleBlower location incidentType title cause description date actionsTaken")
+
     if (reports) {
         return res.status(200).json({
             message: 'Reports',
