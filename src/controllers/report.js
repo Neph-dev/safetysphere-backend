@@ -2,6 +2,7 @@ const Report = require('../models/report.model')
 
 module.exports.getAllReports = async (req, res) => {
     const reports = await Report.find({})
+        .select("whistleBlower location incidentType title cause description date actionsTaken")
 
     if (reports) {
         return res.status(200).json({
