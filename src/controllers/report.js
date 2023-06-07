@@ -17,49 +17,34 @@ module.exports.getAllReports = async (req, res) => {
 
 module.exports.getAllUserReports = async (req, res) => {
 
-    try {
-        const reports = await Report.find({ whistleBlower: req.userId })
-        if (reports) {
-            return res.status(200).json({
-                message: 'All user reports',
-                reports
-            })
-        }
+    const reports = await Report.find({ whistleBlower: req.userId })
+        .select("whistleBlower location incidentType title cause description date actionsTaken")
+    if (reports) {
+        return res.status(200).json({
+            message: 'All user reports',
+            reports
+        })
+    }
 
-        return res.status(404).json({
-            message: 'No reports found'
-        })
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: 'Error getting reports',
-            error: err
-        })
-    }
+    return res.status(404).json({
+        message: 'No reports found'
+    })
 }
 
 module.exports.getAllUserReportLength = async (req, res) => {
-    console.log(req.userId)
-    try {
-        const reports = await Report.find({ whistleBlower: req.userId })
-            .select("whistleBlower")
-        if (reports) {
-            return res.status(200).json({
-                message: 'All user reports',
-                reports
-            })
-        }
 
-        return res.status(404).json({
-            message: 'No reports found'
+    const reports = await Report.find({ whistleBlower: req.userId })
+        .select("whistleBlower")
+    if (reports) {
+        return res.status(200).json({
+            message: 'All user reports',
+            reports
         })
     }
-    catch (err) {
-        return res.status(500).json({
-            message: 'Error getting reports',
-            error: err
-        })
-    }
+
+    return res.status(404).json({
+        message: 'No reports found'
+    })
 }
 
 module.exports.getSingleReport = async (req, res) => {
