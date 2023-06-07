@@ -18,16 +18,24 @@ module.exports.getAllReports = async (req, res) => {
 module.exports.getAllUserReports = async (req, res) => {
 
     const reports = await Report.find({ whistleBlower: req.userId })
-    if (reports) {
-        return res.status(200).json({
-            message: 'All user reports',
-            reports
+    try {
+        if (reports) {
+            return res.status(200).json({
+                message: 'All user reports',
+                reports
+            })
+        }
+
+        return res.status(404).json({
+            message: 'No reports found'
         })
     }
-
-    return res.status(404).json({
-        message: 'No reports found'
-    })
+    catch (err) {
+        return res.status(500).json({
+            message: 'Error getting reports',
+            error: err
+        })
+    }
 }
 
 module.exports.getSingleReport = async (req, res) => {
