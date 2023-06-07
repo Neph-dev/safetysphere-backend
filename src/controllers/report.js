@@ -16,9 +16,9 @@ module.exports.getAllReports = async (req, res) => {
 }
 
 module.exports.getAllUserReports = async (req, res) => {
-
-    const reports = await Report.find({ whistleBlower: req.userId })
+    console.log(req.userId)
     try {
+        const reports = await Report.find({ whistleBlower: req.userId })
         if (reports) {
             return res.status(200).json({
                 message: 'All user reports',
