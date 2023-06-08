@@ -42,6 +42,16 @@ const reportSchema = new Schema({
         type: String,
         required: false,
         default: 'None'
+    },
+    status: {
+        type: String,
+        required: false,
+        default: 'open'
+    },
+    deleted: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 

@@ -1,8 +1,9 @@
+const { checkUserAccessLevel } = require('../middlewares/checkUserAccessLevel')
 const Report = require('../models/report.model')
 
 module.exports.getAllReports = async (req, res) => {
-    const reports = await Report.find({})
-        .select("whistleBlower location incidentType title cause description date actionsTaken")
+    const reports = await Report.find({ deleted: false })
+        .select("whistleBlower location incidentType title cause description date actionsTaken status")
 
     if (reports) {
         return res.status(200).json({
@@ -18,8 +19,8 @@ module.exports.getAllReports = async (req, res) => {
 
 module.exports.getAllUserReports = async (req, res) => {
 
-    const reports = await Report.find({ whistleBlower: req.userId })
-        .select("whistleBlower location incidentType title cause description date actionsTaken")
+    const reports = await Report.find({ whistleBlower: req.userId, deleted: false })
+        .select("whistleBlower location incidentType title cause description date actionsTaken status")
     if (reports) {
         return res.status(200).json({
             message: 'All user reports',
@@ -34,7 +35,7 @@ module.exports.getAllUserReports = async (req, res) => {
 
 module.exports.getAllUserReportLength = async (req, res) => {
 
-    const reports = await Report.find({ whistleBlower: req.userId })
+    const reports = await Report.find({ whistleBlower: req.userId, deleted: false })
         .select("whistleBlower")
     if (reports) {
         return res.status(200).json({
@@ -50,7 +51,7 @@ module.exports.getAllUserReportLength = async (req, res) => {
 
 module.exports.getSingleReport = async (req, res) => {
 
-    const report = await Report.findById(req.params.id)
+    const report = await Report.findOne({ _id: req.params.id, deleted: false })
     if (report) {
         return res.status(200).json({
             message: 'Report',
@@ -72,9 +73,30 @@ module.exports.getReportForaPeriod = async (req, res) => {
         date: {
             $gte: minDate,
             $lte: maxDate
-        }
+        },
+        deleted: false
     })
-        .select("whistleBlower location incidentType title cause description date actionsTaken")
+        .select("whistleBlower location incidentType title cause description date actionsTaken status")
+
+    if (reports) {
+        return res.status(200).json({
+            message: 'Reports',
+            reports
+        })
+    }
+    return res.status(404).json({
+        message: 'No reports found'
+    })
+}
+
+module.exports.getReportByLocation = async (req, res) => {
+
+    let location = req.params.locationName
+
+    const reports = await Report.find({
+        location: location, deleted: false
+    })
+        .select("whistleBlower location incidentType title cause description date actionsTaken status")
 
     if (reports) {
         return res.status(200).json({
@@ -113,4 +135,43 @@ module.exports.addReport = async (req, res) => {
                 error: err
             })
         })
+}
+
+module.exports.updateReportStatus = async (req, res) => {
+
+    await checkUserAccessLevel(req, res)
+
+    let newStatus = req.body.status
+
+    const report = await Report.findByIdAndUpdate(
+        req.params.id, { status: newStatus }
+    )
+
+    if (report) {
+        return res.status(200).json({
+            message: 'Status updated successfully',
+        })
+    }
+
+    return res.status(500).json({
+        message: 'Error updating status'
+    })
+}
+
+module.exports.softDeleteReport = async (req, res) => {
+    await checkUserAccessLevel(req, res)
+
+    const report = await Report.findByIdAndUpdate(req.params.id, { deleted: true })
+
+    if (report) {
+        return res.status(200).json({
+            message: 'Report deleted successfully',
+            report
+        })
+    }
+
+    return res.status(404).json({
+        message: 'Report not found'
+    })
+
 }
