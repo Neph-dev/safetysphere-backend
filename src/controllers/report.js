@@ -109,6 +109,36 @@ module.exports.getReportByLocation = async (req, res) => {
     })
 }
 
+module.exports.getMostImpactedLocation = async (req, res) => {
+
+    const reports = await Report.find({
+        deleted: false
+    })
+        .select("location")
+
+    const locations = reports.map(report => report.location)
+    const uniqueLocations = [...new Set(locations)]
+
+    const locationCount = uniqueLocations.map(location => {
+        return { location, count: locations.filter(loc => loc === location).length }
+    }
+    )
+
+    const sortedLocationCount = locationCount.sort((a, b) => b.count - a.count)
+    const mostImpactedLocation = sortedLocationCount.slice(0, 3)
+
+    if (mostImpactedLocation) {
+        return res.status(200).json({
+            message: 'Most impacted location',
+            mostImpactedLocation
+        })
+    }
+    return res.status(404).json({
+        message: 'No reports found'
+    })
+}
+
+
 module.exports.addReport = async (req, res) => {
 
     const report = new Report({
