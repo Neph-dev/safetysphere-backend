@@ -28,6 +28,14 @@ module.exports.addUser = async (req, res) => {
         })
     }
 
+    // check if req.body.email contains enermin-inter.com after @
+    const emailDomain = req.body.email.split('@')[1]
+    if (emailDomain !== 'enermin-inter.com') {
+        return res.status(400).json({
+            message: 'Invalid email address'
+        })
+    }
+
     const saltRounds = 10
     const generatedPassword = generator.generate({ length: 10, numbers: true })
 
